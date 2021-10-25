@@ -1,50 +1,91 @@
 <template>
   <v-app>
-    <v-app-bar app color="primary" dark>
-      <div class="d-flex align-center">
-        <v-img
-          alt="Vuetify Logo"
-          class="shrink mr-2"
-          contain
-          src="https://cdn.vuetifyjs.com/images/logos/vuetify-logo-dark.png"
-          transition="scale-transition"
-          width="40"
-        />
+    <template v-if="isLoading">
+      <code> Loading... </code>
+    </template>
+    <template v-else>
+      <v-app-bar app color="primary" dark>
+        <div class="d-flex align-center">
+          <h2 class="headline font-weight-bold">Expense Tracker</h2>
+        </div>
 
-        <v-img
-          alt="Vuetify Name"
-          class="shrink mt-1 hidden-sm-and-down"
-          contain
-          min-width="100"
-          src="https://cdn.vuetifyjs.com/images/logos/vuetify-name-dark.png"
-          width="100"
-        />
-      </div>
+        <v-spacer></v-spacer>
+        <div v-if="user">
+          <span>
+            Hola
+            <strong> {{ displayName }} </strong>
+          </span>
+          <v-btn @click="logout" text> Logout </v-btn>
+        </div>
 
-      <v-spacer></v-spacer>
+        <v-btn @click="login" text v-else> Login </v-btn>
+      </v-app-bar>
 
-      <v-btn
-        href="https://github.com/vuetifyjs/vuetify/releases/latest"
-        target="_blank"
-        text
-      >
-        <span class="mr-2">Latest Release</span>
-        <v-icon>mdi-open-in-new</v-icon>
-      </v-btn>
-    </v-app-bar>
-
-    <v-main>
-      <router-view />
-    </v-main>
+      <v-main>
+        <router-view />
+      </v-main>
+    </template>
   </v-app>
 </template>
 
 <script>
-export default {
-  name: "App",
+import { mapGetters, mapActions } from 'vuex'
 
-  data: () => ({
-    //
-  }),
-};
+import {
+  getAuth,
+  signInWithPopup,
+  GoogleAuthProvider,
+  onAuthStateChanged,
+  signOut
+} from 'firebase/auth'
+
+const provider = new GoogleAuthProvider()
+
+export default {
+  name: 'App',
+
+  computed: {
+    ...mapGetters(['user']),
+    displayName: (vm) => (vm.user ? vm.user.displayName : '')
+  },
+
+  data() {
+    return {
+      isLoading: true
+    }
+  },
+
+  mounted() {
+    const auth = getAuth()
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        this.setUser(user)
+      }
+      this.isLoading = false
+    })
+  },
+
+  methods: {
+    ...mapActions(['setUser']),
+    async login() {
+      try {
+        const auth = getAuth()
+        const result = await signInWithPopup(auth, provider)
+        this.setUser(result.user)
+      } catch (error) {
+        console.error(error)
+      }
+    },
+
+    async logout() {
+      try {
+        const auth = getAuth()
+        await signOut(auth)
+        window.location.href = ''
+      } catch (error) {
+        console.error(error)
+      }
+    }
+  }
+}
 </script>
