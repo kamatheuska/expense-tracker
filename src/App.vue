@@ -5,6 +5,10 @@
     </template>
     <template v-else>
       <v-app-bar app color="primary" dark>
+        <v-app-bar-nav-icon
+          @click.stop="showNavigation = !showNavigation"
+        ></v-app-bar-nav-icon>
+
         <div class="d-flex align-center">
           <h1 class="headline font-weight-bold">
             {{ appName }}
@@ -17,6 +21,15 @@
         </div>
       </v-app-bar>
 
+      <v-navigation-drawer v-model="showNavigation" absolute bottom temporary>
+        <v-list nav dense>
+          <v-list-item-group active-class="deep-purple--text text--accent-4">
+            <v-list-item href="/expenses">
+              <v-list-item-title>Gastos</v-list-item-title>
+            </v-list-item>
+          </v-list-item-group>
+        </v-list>
+      </v-navigation-drawer>
       <v-main>
         <router-view v-if="true" />
 
@@ -57,7 +70,8 @@ export default {
   data() {
     return {
       isLoading: true,
-      appName: APP_NAME
+      appName: APP_NAME,
+      showNavigation: false
     }
   },
 

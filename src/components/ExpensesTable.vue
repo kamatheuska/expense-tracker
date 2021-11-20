@@ -9,7 +9,10 @@
       :search="search"
       mobile-breakpoint="0"
       :loading="!fetched"
-      loading-text="Loading... Please wait"
+      loading-text="Cargando, por favor espere..."
+      :footer-props="{
+        itemsPerPageText: 'Items por página'
+      }"
     >
       <template v-slot:top>
         <v-text-field
@@ -19,10 +22,10 @@
         ></v-text-field>
       </template>
 
-      <template v-slot:item.value="{ item }">
+      <template v-slot:item.cost="{ item }">
         <div class="d-flex align-items">
           <v-icon size="small"> mdi-currency-usd </v-icon>
-          <span> {{ item.value }} </span>
+          <span> {{ item.cost }} </span>
         </div>
       </template>
       <template v-slot:item.actions="{ item }">
@@ -33,17 +36,11 @@
             dark
             x-small
             color="primary"
-            @click="$emit('editExpense', item)"
+            @click="$emit('edit', item)"
           >
             <v-icon> mdi-pencil </v-icon>
           </v-btn>
-          <v-btn
-            fab
-            dark
-            x-small
-            color="red"
-            @click="$emit('deleteExpense', item)"
-          >
+          <v-btn fab dark x-small color="red" @click="$emit('delete', item)">
             <v-icon> mdi-delete </v-icon>
           </v-btn>
         </v-btn-toggle>
@@ -80,7 +77,7 @@ export default {
     formattedExpenses() {
       return this.expenses.map((expense) => ({
         ...expense,
-        value: expense.value.toLocaleString(),
+        cost: expense.cost.toLocaleString(),
         actions: {}
       }))
     },
@@ -101,7 +98,7 @@ export default {
         {
           text: 'Valor',
           width: '30%',
-          value: 'value'
+          value: 'cost'
         },
         {
           text: 'Acciones',

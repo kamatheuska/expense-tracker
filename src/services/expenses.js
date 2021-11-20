@@ -1,35 +1,40 @@
-import { db } from '@/main'
-import { addDoc, collection, getDocs, deleteDoc, doc } from 'firebase/firestore'
-import { EXPENSES_COLLECTION_NAME } from '@/constants'
+import request from '@/request'
 
-export const createExpense = async (expense) => {
+export const createExpense = async (expense, opts) => {
   try {
-    return await addDoc(collection(db, EXPENSES_COLLECTION_NAME), expense)
-  } catch (error) {
-    console.error(error)
-  }
-}
-
-export const fetchExpenses = async () => {
-  let docs = []
-  try {
-    const querySnapshot = await getDocs(
-      collection(db, EXPENSES_COLLECTION_NAME)
-    )
-    querySnapshot.forEach((doc) => {
-      docs.push(doc.data())
+    return request({
+      ...opts,
+      method: 'POST',
+      body: expense
     })
-
-    return docs
   } catch (error) {
     console.error(error)
   }
 }
 
-export const deleteExpenses = async () => {
+export const editExpense = async (expense, opts) => {
   try {
-    doc()
-    return await deleteDoc(collection(db, EXPENSES_COLLECTION_NAME))
+    return request({
+      ...opts,
+      method: 'POST',
+      body: expense
+    })
+  } catch (error) {
+    console.error(error)
+  }
+}
+
+export const fetchExpenses = async (opts) => {
+  return request({ ...opts })
+}
+
+export const deleteExpense = async (expense, opts) => {
+  console.log('Printing- - - - opts:', opts)
+  try {
+    return request({
+      ...opts,
+      body: expense
+    })
   } catch (error) {
     console.error(error)
   }

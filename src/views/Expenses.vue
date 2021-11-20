@@ -1,19 +1,39 @@
 <template>
   <div class="expenses">
-    <v-container>
+    <v-container class="px-0">
       <v-row>
         <v-col cols="12">
-          <add-expense-dialog
+          <div class="px-3">
+            <h1>Gastos</h1>
+          </div>
+        </v-col>
+      </v-row>
+      <v-row>
+        <v-col cols="12">
+          <AddExpenseDialog
             v-model="isExpenseDialogOpen"
             :expense="currentExpense"
             @submitted="onExpenseSubmit"
             :isEdit="!!currentExpense"
-          />
-          <expenses-table
+          >
+            <template v-slot:date-activator="{ on, attrs, form }">
+              <v-text-field
+                v-model="form.date"
+                label="Fecha"
+                prepend-icon="mdi-calendar"
+                readonly
+                v-bind="attrs"
+                v-on="on"
+                class="mt-5"
+              ></v-text-field>
+            </template>
+          </AddExpenseDialog>
+          <ExpensesTable
             :fetched="fetched"
             :error-message="errorMessage"
             :expenses="expenses"
-            @editExpense="openExpenseDialog"
+            @edit="openExpenseDialog"
+            @delete="deleteExpense"
           />
         </v-col>
         <v-col> </v-col>
@@ -61,7 +81,7 @@ export default {
   },
 
   methods: {
-    ...mapActions(['getExpenses', 'editExpense']),
+    ...mapActions(['getExpenses', 'editExpense', 'removeExpense']),
 
     async updateExpense(expense) {
       try {
@@ -70,10 +90,20 @@ export default {
         console.error(error)
       }
     },
+
+    async deleteExpense(expense) {
+      try {
+        await this.removeExpense(expense)
+      } catch (error) {
+        console.error(error)
+      }
+    },
+
     openExpenseDialog(expense) {
       this.currentExpense = expense
       this.isExpenseDialogOpen = true
     },
+
     onExpenseSubmit(show) {
       this.currentExpense = null
       this.isExpenseDialogOpen = show
