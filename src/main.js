@@ -4,6 +4,7 @@ import router from './router'
 import store from './store'
 import vuetify from './plugins/vuetify'
 import { initializeApp } from 'firebase/app'
+import { getFirestore } from 'firebase/firestore'
 
 Vue.config.productionTip = false
 
@@ -16,9 +17,8 @@ const config = {
   appId: '1:409192637961:web:0498bed9ae4980c64b3ad8'
 }
 
-const firebaseApp = initializeApp(config)
-console.log('Printing- - - - firebaseApp:', firebaseApp)  // eslint-disable-line
-
+export const firebaseApp = initializeApp(config)
+export const db = getFirestore()
 new Vue({
   router,
   store,

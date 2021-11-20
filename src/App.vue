@@ -6,23 +6,27 @@
     <template v-else>
       <v-app-bar app color="primary" dark>
         <div class="d-flex align-center">
-          <h2 class="headline font-weight-bold">Expense Tracker</h2>
+          <h1 class="headline font-weight-bold">
+            {{ appName }}
+          </h1>
         </div>
 
         <v-spacer></v-spacer>
         <div v-if="user">
-          <span>
-            Hola
-            <strong> {{ displayName }} </strong>
-          </span>
           <v-btn @click="logout" text> Logout </v-btn>
         </div>
-
-        <v-btn @click="login" text v-else> Login </v-btn>
       </v-app-bar>
 
       <v-main>
-        <router-view />
+        <router-view v-if="true" />
+
+        <v-container v-else>
+          <div>
+            <p>Por favor autenticate para empezar</p>
+
+            <v-btn color="primary" @click="login"> Login </v-btn>
+          </div>
+        </v-container>
       </v-main>
     </template>
   </v-app>
@@ -30,6 +34,7 @@
 
 <script>
 import { mapGetters, mapActions } from 'vuex'
+import { APP_NAME } from '@/constants'
 
 import {
   getAuth,
@@ -51,7 +56,8 @@ export default {
 
   data() {
     return {
-      isLoading: true
+      isLoading: true,
+      appName: APP_NAME
     }
   },
 
