@@ -52,7 +52,7 @@
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn :disabled="!valid" color="primary" @click="onSubmit">
+          <v-btn :disabled="!valid" color="primary" @click="$emit('add', form)">
             Salvar
           </v-btn>
         </v-card-actions>
@@ -62,31 +62,25 @@
 </template>
 
 <script>
-import { mapActions } from 'vuex'
-const initialForm = {
-  id: '',
-  description: '',
-  cost: 1000,
-  date: new Date(Date.now() - new Date().getTimezoneOffset() * 60000)
-    .toISOString()
-    .substr(0, 10)
-}
-
 export default {
   data() {
     return {
       showDatePicker: false,
       valid: false,
-      rules: {
-        description: [(v) => !!v || 'Una descripcion es necesaria'],
-        value: [(v) => v > 0 || 'Tiene que ser mayor que cero (0)']
-      },
-      form: this.isEdit ? { ...this.expense } : { ...initialForm }
+      form: this.resetForm
     }
   },
 
   props: {
     value: Boolean,
+    initialForm: {
+      type: Object,
+      required: true
+    },
+    rules: {
+      type: Object,
+      required: true
+    },
     expense: {
       type: Object,
       default: () => {}
@@ -99,31 +93,22 @@ export default {
         return this.value
       },
       set(show) {
-        this.$emit('submitted', show)
+        this.$emit('open', { show })
       }
+    },
+    resetForm() {
+      return this.isEdit ? { ...this.expense } : { ...this.initialForm }
     }
   },
 
-  methods: {
-    ...mapActions(['addExpense']),
-
-    async onSubmit() {
-      try {
-        const expense = {
-          ...this.form,
-          cost: Number.parseInt(this.form.cost)
-        }
-        await this.addExpense(expense)
-      } catch (error) {
-        console.error(error)
-      } finally {
-        this.$emit('submitted')
-      }
-    }
+  mounted() {
+    this.form = this.resetForm
   },
 
-  created() {
-    this.form = this.isEdit ? { ...this.expense } : { ...initialForm }
+  watch: {
+    showDialog() {
+      this.form = this.resetForm
+    }
   }
 }
 </script>

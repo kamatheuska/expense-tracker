@@ -13,25 +13,28 @@
           <AddExpenseDialog
             v-model="isExpenseDialogOpen"
             :expense="currentExpense"
-            @submitted="onExpenseSubmit"
+            :initialForm="initialForm"
             :isEdit="!!currentExpense"
+            :rules="rules"
+            @add="createExpense"
+            @open="openExpenseDialog"
           >
             <template v-slot:date-activator="{ on, attrs, form }">
               <v-text-field
                 v-model="form.date"
-                label="Fecha"
-                prepend-icon="mdi-calendar"
-                readonly
                 v-bind="attrs"
                 v-on="on"
                 class="mt-5"
+                label="Fecha"
+                prepend-icon="mdi-calendar"
+                readonly
               ></v-text-field>
             </template>
           </AddExpenseDialog>
           <ExpensesTable
-            :fetched="fetched"
             :error-message="errorMessage"
             :expenses="expenses"
+            :fetched="fetched"
             @edit="openExpenseDialog"
             @delete="deleteExpense"
           />
@@ -47,6 +50,20 @@ import { mapGetters, mapActions } from 'vuex'
 
 import AddExpenseDialog from '@/components/AddExpenseDialog'
 import ExpensesTable from '@/components/ExpensesTable'
+
+const rules = {
+  description: [(v) => !!v || 'Una descripcion es necesaria'],
+  cost: [(v) => v > 0 || 'Tiene que ser mayor que cero (0)']
+}
+
+const initialForm = {
+  id: '',
+  description: '',
+  cost: 1000,
+  date: new Date(Date.now() - new Date().getTimezoneOffset() * 60000)
+    .toISOString()
+    .substr(0, 10)
+}
 
 export default {
   name: 'ExpensesView',
@@ -72,16 +89,34 @@ export default {
       search: '',
       errorMessage: '',
       isExpenseDialogOpen: false,
-      currentExpense: null
+      currentExpense: null,
+      rules,
+      initialForm
     }
   },
 
   computed: {
-    ...mapGetters(['expenses'])
+    ...mapGetters('expenses', ['expenses'])
   },
 
   methods: {
-    ...mapActions(['getExpenses', 'editExpense', 'removeExpense']),
+    ...mapActions('expenses', [
+      'addExpense',
+      'editExpense',
+      'getExpenses',
+      'removeExpense'
+    ]),
+
+    async createExpense(form) {
+      this.currentExpense = null
+      this.isExpenseDialogOpen = false
+
+      try {
+        await this.addExpense(form)
+      } catch (error) {
+        console.error(error)
+      }
+    },
 
     async updateExpense(expense) {
       try {
@@ -99,13 +134,8 @@ export default {
       }
     },
 
-    openExpenseDialog(expense) {
+    openExpenseDialog({ show = true, expense = null }) {
       this.currentExpense = expense
-      this.isExpenseDialogOpen = true
-    },
-
-    onExpenseSubmit(show) {
-      this.currentExpense = null
       this.isExpenseDialogOpen = show
     }
   }

@@ -36,7 +36,7 @@
             dark
             x-small
             color="primary"
-            @click="$emit('edit', item)"
+            @click="$emit('edit', { expense: item })"
           >
             <v-icon> mdi-pencil </v-icon>
           </v-btn>
@@ -77,7 +77,6 @@ export default {
     formattedExpenses() {
       return this.expenses.map((expense) => ({
         ...expense,
-        cost: expense.cost.toLocaleString(),
         actions: {}
       }))
     },
