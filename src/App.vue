@@ -1,7 +1,7 @@
 <template>
   <v-app>
     <template v-if="isLoading">
-      <code> Loading... </code>
+      <code> Cargando la app... </code>
     </template>
     <template v-else>
       <v-app-bar app color="primary" dark>
@@ -16,8 +16,8 @@
         </div>
 
         <v-spacer></v-spacer>
-        <div v-if="user">
-          <v-btn @click="logout" text> Logout </v-btn>
+        <div>
+          <v-btn @click="() => {}" text> Logout </v-btn>
         </div>
       </v-app-bar>
 
@@ -46,18 +46,8 @@
 </template>
 
 <script>
-import { mapGetters, mapActions } from 'vuex'
+import { mapGetters } from 'vuex'
 import { APP_NAME } from '@/constants'
-
-import {
-  getAuth,
-  signInWithPopup,
-  GoogleAuthProvider,
-  onAuthStateChanged,
-  signOut
-} from 'firebase/auth'
-
-const provider = new GoogleAuthProvider()
 
 export default {
   name: 'App',
@@ -74,38 +64,10 @@ export default {
       showNavigation: false
     }
   },
-
   mounted() {
-    const auth = getAuth()
-    onAuthStateChanged(auth, (user) => {
-      if (user) {
-        this.setUser(user)
-      }
+    setTimeout(() => {
       this.isLoading = false
-    })
-  },
-
-  methods: {
-    ...mapActions(['setUser']),
-    async login() {
-      try {
-        const auth = getAuth()
-        const result = await signInWithPopup(auth, provider)
-        this.setUser(result.user)
-      } catch (error) {
-        console.error(error)
-      }
-    },
-
-    async logout() {
-      try {
-        const auth = getAuth()
-        await signOut(auth)
-        window.location.href = ''
-      } catch (error) {
-        console.error(error)
-      }
-    }
+    }, 1000)
   }
 }
 </script>

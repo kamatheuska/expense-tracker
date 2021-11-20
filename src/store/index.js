@@ -16,23 +16,15 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
-    auth: {
-      user: null
-    },
     expenses: [],
     currentExpense: null
   },
 
   getters: {
-    user: ({ auth }) => auth.user,
     expenses: ({ expenses }) => expenses
   },
 
   mutations: {
-    setUser(state, user) {
-      state.auth.user = user
-    },
-
     setExpenses(state, newExpenses) {
       state.expenses = newExpenses
     },
@@ -43,10 +35,6 @@ export default new Vuex.Store({
   },
 
   actions: {
-    setUser({ commit }, user) {
-      commit('setUser', user)
-    },
-
     async addExpense({ commit }, expense) {
       const doc = await createExpense(expense, {
         mock: addExpenseMock
